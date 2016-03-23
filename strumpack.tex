@@ -1,7 +1,44 @@
-\documenclass{article}
+\documentclass{acmsmall}
 \usepackage{url}
+\usepackage[ruled]{algorithm2e}
+\renewcommand{\algorithmcfname}{ALGORITHM}
+\SetAlFnt{\small}
+\SetAlCapFnt{\small}
+\SetAlCapNameFnt{\small}
+\SetAlCapHSkip{0pt}
+\IncMargin{-\parindent}
 
 \begin{document}
+
+\title{Strumpack}
+\author{Dominic Meiser
+\affil{Tech-X Corporation, Boulder, CO 80303, USA.}
+}
+
+
+\begin{abstract}
+Multifrequency media access control has been well understood in
+general wireless ad hoc networks, while in wireless sensor networks,
+researchers still focus on single frequency solutions. In wireless
+sensor networks, each device is typically equipped with a single
+radio transceiver and applications adopt much smaller packet sizes
+compared to those in general wireless ad hoc networks. Hence, the
+multifrequency MAC protocols proposed for general wireless ad hoc
+networks are not suitable for wireless sensor network applications,
+which we further demonstrate through our simulation experiments. In
+this article, we propose MMSN, which takes advantage of
+multifrequency availability while, at the same time, takes into
+consideration the restrictions of wireless sensor networks. Through
+extensive experiments, MMSN exhibits the prominent ability to utilize
+parallel transmissions among neighboring nodes. When multiple physical
+frequencies are available, it also achieves increased energy
+efficiency, demonstrating the ability to work against radio
+interference and the tolerance to a wide range of measured time
+synchronization errors.
+\end{abstract}
+
+\maketitle 
+
 \begin{itemize}
   \item Download strumpack
   \item readme
