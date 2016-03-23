@@ -1,0 +1,60 @@
+\documenclass{article}
+\usepackage{url}
+
+\begin{document}
+\begin{itemize}
+  \item Download strumpack
+  \item readme
+  \item build on laptop
+  \item build on edison
+  \item run examples
+  \item reproduce results
+
+\end{itemize}
+
+\section{First impressions}
+
+Downloaded the source package from
+\url{http://portal.nersc.gov/project/sparse/strumpack/STRUMPACK-Dense-1.1.1.tar.gz}
+
+Unpacked using \verb!tar xf STRUMPACK-Dense-1.1.1.tar.gz!
+
+In the source distribution there is a 20 page manual with
+introduction, installation instructions, background on the
+algorithms, and an API reference.  A 167 line long readme file
+provides concise instructions on getting started.
+
+Primary requirements:
+- MPI
+- blas/lapack
+- scalapack
+
+We use mpich v 3.1.4, along with reference lapack and blas.
+
+scalapack 2.0.2
+
+gcc 4.9.3
+
+
+\section{building}
+
+Modify Makefile.gnu:
+\begin{itemize}
+\item Set blas, lapack, and scalapack libraries
+\item set compiler wrappers
+\end{itemize}
+
+Use that Makefile as an include in Makefile in examples.
+
+Then make -j8
+
+
+Compiles with a relatively large number of warnings.
+
+Built C++, C, and Fortran example.  Didn't try matlab/octave example.
+
+Ran a few examples.
+
+
+
+\end{document}
