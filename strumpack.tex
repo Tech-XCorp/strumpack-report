@@ -12,7 +12,7 @@
 
 \title{Strumpack}
 \author{Dominic Meiser
-\affil{Tech-X Corporation, Boulder, CO 80303, USA.}
+\affil{Tech-X Corporation, 5621 Arapahoe Avenue, Boulder CO, 80303, USA.}
 }
 
 
@@ -21,6 +21,8 @@ Abstract goes here.
 \end{abstract}
 
 \maketitle 
+
+\section{Todo}
 
 \begin{itemize}
   \item Download strumpack
@@ -32,28 +34,59 @@ Abstract goes here.
 
 \end{itemize}
 
-\section{First impressions}
+\section{Introduction}
 
-Downloaded the source package from
-\url{http://portal.nersc.gov/project/sparse/strumpack/STRUMPACK-Dense-1.1.1.tar.gz}
+In this report we replicate the results reported
+in~\cite{strumpackpaper}.  We focus on the performance results
+reported in Table III and Table VI.\@  Specifically, we carry out
+the following steps:
 
-Unpacked using \verb!tar xf STRUMPACK-Dense-1.1.1.tar.gz!
+\begin{enumerate}
+  \item Download strumpack distribution package.
+  \item Build strumpack on laptop.
+  \item Build strumpack on Edison~\cite{Edison} at NERSC.
+  \item Run strumpack using matrixfree, toeplitz matrix, and a EM
+    BEM matrix.
+\end{enumerate}
 
-In the source distribution there is a 20 page manual with
+
+\section{Building STRUMPACK on a laptop}
+
+To verify that we could build the package we first get it to run
+on a laptop.  This allows us to iron out any issues ahead of time
+in an environment that we have complete control over before
+attempting to do the same on an expensive computer like Edison.
+
+We obtain the sources from the distribution tarball
+\begin{verbatim}
+STRUMPACK_URL=http://portal.nersc.gov/project/sparse/strumpack \
+  TARBALL_NAME=STRUMPACK-Dense-1.1.1.tar.gz \
+  wget $STRUMPACK_URL/$TARBALL_NAME
+tar xf STRUMPACK-Dense-1.1.1.tar.gz
+\end{verbatim}
+
+Contained in the source distribution is a 20 page manual with
 introduction, installation instructions, background on the
-algorithms, and an API reference.  A 167 line long readme file
-provides concise instructions on getting started.
+algorithms, and an API reference.  A readme file
+provides concise instructions on how to build STRUMPACK.
 
-Primary requirements:
-- MPI
-- blas/lapack
-- scalapack
+We satisfy the STRUMPACK library requirements as follows:
+\begin{itemize}
+\item MPI:\@ mpich v 3.1.4
+\item BLAS/LAPACK:\@ binary distribution on centos 6
+\item ScaLAPACK:\@ Reference implementation from netlib~\cite{netlib}
+\end{itemize}
 
-We use mpich v 3.1.4, along with reference lapack and blas.
+We use the compiler gcc version 4.9.3.
 
-scalapack 2.0.2
-
-gcc 4.9.3
+STRUMPACK's build system consists of makefiles.  They are
+customized by writing a Makefile.inc that defines system specific
+variables.  Template Makefile.inc files are provided for gnu
+based linux systems, edison, and hopper.  To build on our laptop
+we modify Makefile.gnu to point to our mpi, blas, lapack, and
+scalapack installation.  We build the C++, C, and Fortran
+examples.  We don't verify building of the matlab bindings
+because our laptop does not have matlab installed.
 
 
 \section{building}
@@ -74,6 +107,184 @@ Compiles with a relatively large number of warnings.
 Built C++, C, and Fortran example.  Didn't try matlab/octave example.
 
 Ran a few examples.
+
+
+\section{Building on Edison}
+
+PrgEnv-intel/5.2.56
+
+> icc --version
+icc (ICC) 15.0.1 20141023
+
+cray-mpich/7.3.1
+
+Makefile.edison
+
+works out of the box for \verb!c_example! and \verb!cpp_examples!
+
+
+
+\section{Runs on Edison}
+
+\if 0
+Get an interactive job:
+
+
+dmeiser@edison01:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+salloc -N 1 -p debug
+salloc: Pending job allocation 270436
+salloc: job 270436 queued and waiting for resources
+salloc: job 270436 has been allocated resources
+salloc: Granted job allocation 270436
+
+
+Now run with just one mpi process:
+
+
+dmeiser@nid03581:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+srun -n 1 ./matrixfree
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: in this version, adaptive sampling is disabled when samples are
+provided. Only \verb!min_rand_HSS! is used.
+Sequential HSS compression with 6 levels in the tree...
+Done in 0.087343s; max rank = 17; effective number of random vectors =
+32
+
+Sequential ULV factorization...
+Done in 0.039345s
+
+Sequential HSS triangular solution...
+Done in 0.000610113s
+
+Forward error = 1.62915e-11
+
+
+
+Then next we have for two nodes:
+
+dmeiser@nid03581:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+srun -n 2 ./matrixfree
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: in this version, adaptive sampling is disabled when samples are
+provided. Only min_rand_HSS is used.
+Parallel HSS compression with 6 levels in the tree...
+Done in 0.0132849s; max rank = 17; effective number of random vectors =
+32
+
+Parallel ULV factorization...
+Done in 0.00523615s
+
+Parallel HSS triangular solution...
+Done in 0.000921965s
+
+Forward error = 9.54785e-12
+
+
+For 4 nodes we have:
+
+
+dmeiser@nid03581:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+srun -n 4 ./matrixfree
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: in this version, adaptive sampling is disabled when samples are
+provided. Only min_rand_HSS is used.
+Parallel HSS compression with 6 levels in the tree...
+Done in 0.013396s; max rank = 17; effective number of random vectors =
+32
+
+Parallel ULV factorization...
+Done in 0.00575089s
+
+Parallel HSS triangular solution...
+Done in 0.00184917s
+
+Forward error = 5.02496e-11
+
+
+I am suspecting that this is somehow just a serial executable that is
+being redundently replicated by mpi.
+
+
+
+Increase problem size for matrix free to 2**20.
+
+At that problem size I do see scaling nearly perfect scaling:
+
+dmeiser@nid03581:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+srun -n 4 ./matrixfree
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: in this version, adaptive sampling is disabled when samples are
+provided. Only min_rand_HSS is used.
+Parallel HSS compression with 16 levels in the tree...
+Done in 8.80102s; max rank = 17; effective number of random vectors = 32
+
+Parallel ULV factorization...
+Done in 1.0605s
+
+Parallel HSS triangular solution...
+Done in 1.66623s
+
+Forward error = 5.01952e-07
+dmeiser@nid03581:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+srun -n 1 ./matrixfree
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: in this version, adaptive sampling is disabled when samples are
+provided. Only min_rand_HSS is used.
+Sequential HSS compression with 16 levels in the tree...
+Done in 29.8492s; max rank = 17; effective number of random vectors = 32
+
+Sequential ULV factorization...
+Done in 4.01861s
+
+Sequential HSS triangular solution...
+Done in 2.1058s
+
+Forward error = 1.0284e-06
+
+
+And with 24 cores:
+
+
+dmeiser@nid03581:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples>
+srun -n 24 ./matrixfree
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: in this version, adaptive sampling is disabled when samples are
+provided. Only min_rand_HSS is used.
+Parallel HSS compression with 16 levels in the tree...
+Done in 3.29835s; max rank = 17; effective number of random vectors = 32
+
+Parallel ULV factorization...
+Done in 0.286516s
+
+Parallel HSS triangular solution...
+Done in 1.6871s
+
+Forward error = 7.42614e-07
+
+
+Now increase size to 100 * 2**20:
+
+
+Monitored memory usage:  One rank seems to be building the whole matrix.
+Job gets terminated.  Presumably runs out of memory.
+
+
+
+Reduce problem size to 10 * 2**20:
+
+Also gets killed.  Also out of memory?
+
+
+
+
+\fi
+
 
 
 
