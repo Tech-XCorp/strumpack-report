@@ -10,7 +10,10 @@
 
 \begin{document}
 
-\title{Strumpack}
+\title{Replicated Computational Results (RCR) Report for
+  \textit{A distributed-memory package for dense Hierarchically
+    Semi-Separable matrix computations using randomization}}
+
 \author{Dominic Meiser
 \affil{Tech-X Corporation, 5621 Arapahoe Avenue, Boulder CO, 80303, USA.}
 }
@@ -21,18 +24,6 @@ Abstract goes here.
 \end{abstract}
 
 \maketitle 
-
-\section{Todo}
-
-\begin{itemize}
-  \item Download strumpack
-  \item readme
-  \item build on laptop
-  \item build on edison
-  \item run examples
-  \item reproduce results
-
-\end{itemize}
 
 \section{Introduction}
 
@@ -89,42 +80,248 @@ examples.  We don't verify building of the matlab bindings
 because our laptop does not have matlab installed.
 
 
-\section{building}
-
-Modify Makefile.gnu:
-\begin{itemize}
-\item Set blas, lapack, and scalapack libraries
-\item set compiler wrappers
-\end{itemize}
-
-Use that Makefile as an include in Makefile in examples.
-
-Then make -j8
-
-
-Compiles with a relatively large number of warnings.
-
-Built C++, C, and Fortran example.  Didn't try matlab/octave example.
-
-Ran a few examples.
-
-
 \section{Building on Edison}
 
-PrgEnv-intel/5.2.56
-
-> icc --version
-icc (ICC) 15.0.1 20141023
-
-cray-mpich/7.3.1
-
-Makefile.edison
-
-works out of the box for \verb!c_example! and \verb!cpp_examples!
-
+We build STRUMPACK on Edison~\cite{edison} at NERSC.  We use the
+default intel programming environment, \verb!PrgEnv-intel/5.2.56!
+with version 15.0.1 20141023 of the intel compilers, with module
+\verb!cray-mpich/7.3.1! for MPI support.  The template
+\verb!Makefile.edison! provided with the source distribution of
+STRUMPACK works without modifications with these modules.
 
 
 \section{Runs on Edison}
+
+We use \verb!solve.cpp! to reproduce the results for the QChem Toeplitz
+matrices.  Currently there is no mechanism to control the example
+program via command line options.  Thus we modify the
+\verb!solve.cpp! source code and rebuild for every set of
+parameters.  We set the problem size to \verb!n=80,000!, change the
+number of right hand sides to \verb!nrhs=1!, and the \verb!sdp!
+object is configured as follows:
+\begin{verbatim}
+sdp.use_HSS=true;
+sdp.levels_HSS=4;
+sdp.min_rand_HSS=10;
+sdp.lim_rand_HSS=5;
+sdp.inc_rand_HSS=10;
+sdp.max_rand_HSS=100;
+sdp.tol_HSS=1e-6;
+sdp.steps_IR=10;
+sdp.tol_IR=1e-10;
+\end{verbatim}
+The parameter $\epsilon$ in Table III in~\cite{strumpack} is set
+by means of \verb!sdp.tol_HSS!.  The above example corresponds to
+$\epsilon=10^{-6}$.
+
+Reporting of performance numbers relies on the
+\verb!sdp.print_statistics()! function.
+\begin{verbatim}
+dmeiser@edison06:/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples> cat slurm-283331.out STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 4 levels in the tree...
+Done in 6.3149s; max rank = 25; effective number of random vectors = 30
+
+Checking compression quality by computing HSS(A)*I-A...
+Compression quality: ||HSS(A)*I-A||_fro/||A||_fro=1.13135e-06
+Done in 72.9601s
+
+Parallel ULV factorization...
+Done in 17.4305s
+
+Parallel HSS triangular solution...
+Done in 0.0519109s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=0.0162769
+Done in 0.17655s
+
+Iterative refinement of the solution...
+Step 0: err = 0.0162769
+Step 1: err = 3.11065e-05
+Step 2: err = 1.566e-08
+Step 3: err = 3.25426e-11
+Done in 0.841797s
+
+Statistics: 
+
+Time spent in compression:    6.3149 (s)
+Time spent in initial distrib:4.09419 (s)
+Random number generation:     min= 0 (s); avg=0.000312994 (s); max=0.00829101 (s)
+Global sample GEMMs:          min= 0 (s); avg=0.747502 (s); max=0.807224 (s)
+Interpolative decompositions: min= 0.0874553 (s); avg=0.133993 (s); max=0.159099 (s)
+Flops for compression (GFlops): min= 0.501309; avg= 4.50218; max= 4.72233; total= 864.419
+HSS factors (MB): min= 31.9236; avg= 31.9687; max= 31.9875; total= 6137.99
+
+Time spent in factorization: 17.4305 (s)
+Flops for factorization (GFlops): min= 111.207; avg= 111.264; max= 111.29; total= 21362.7
+ULV factors (MB): min= 95.4397; avg= 95.4445; max= 95.4491; total= 18325.3
+
+Cumulated time in solution steps: 0.221854 (s)
+Cumulated flops in solution steps (GFlops): min= 0.0833618; avg= 0.0833856; max= 0.0833961; total= 16.01
+
+Cumulated time in matrix-vector products: 73.8082 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 667.868; avg= 669.345; max= 669.766; total= 128514
+\end{verbatim}
+
+Then we change the configuration of the solver to use more
+levels.  With 10 levels and binary partitioning the smallest
+blocks are approximately of size $80\times 80$.
+
+\begin{verbatim}
+cat slurm-283339.out
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 10 levels in the tree...
+Done in 24.2096s; max rank = 284; effective number of random vectors = 290
+
+Checking compression quality by computing HSS(A)*I-A...
+Compression quality: ||HSS(A)*I-A||_fro/||A||_fro=7.90952e-06
+Done in 132.367s
+
+Parallel ULV factorization...
+Done in 0.0836282s
+
+Parallel HSS triangular solution...
+Done in 0.234635s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=0.337526
+Done in 0.10144s
+
+Iterative refinement of the solution...
+Step 0: err = 0.337526
+Step 1: err = 0.00208538
+Step 2: err = 4.68857e-06
+Step 3: err = 2.42297e-08
+Step 4: err = 6.58082e-11
+Done in 1.8198s
+
+Statistics: 
+
+Time spent in compression:    24.2096 (s)
+Time spent in initial distrib:5.22616 (s)
+Random number generation:     min= 0 (s); avg=0.00279698 (s); max=0.0779147 (s)
+Global sample GEMMs:          min= 0 (s); avg=6.9025 (s); max=7.4137 (s)
+Interpolative decompositions: min= 0.112913 (s); avg=0.411206 (s); max=0.476292 (s)
+Flops for compression (GFlops): min= 0.0672211; avg= 38.7594; max= 40.9268; total= 7441.81
+HSS factors (MB): min= 0.463115; avg= 0.651353; max= 0.960966; total= 125.06
+
+Time spent in factorization: 0.0836282 (s)
+Flops for factorization (GFlops): min= 0.0234966; avg= 0.0348716; max= 0.0505406; total= 6.69535
+ULV factors (MB): min= 1.21561; avg= 1.67285; max= 2.45697; total= 321.188
+
+Cumulated time in solution steps: 1.17243 (s)
+Cumulated flops in solution steps (GFlops): min= 0.00137123; avg= 0.00191374; max= 0.00279944; total= 0.367439
+
+Cumulated time in matrix-vector products: 133.35 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 9.44839; avg= 13.9909; max= 20.4663; total= 2686.25
+\end{verbatim}
+At ten levels we get a maximum rank of 284.  The compression time
+is 24s which is roughly comparable to Table III (albeit on a
+larger number of cores).
+
+Then we increase to 13 levels.
+\begin{verbatim}
+cat slurm-283349.out
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 13 levels in the tree...
+Done in 32.1354s; max rank = 405; effective number of random vectors = 410
+
+Checking compression quality by computing HSS(A)*I-A...
+Compression quality: ||HSS(A)*I-A||_fro/||A||_fro=2.03758e-05
+Done in 140.797s
+
+Parallel ULV factorization...
+Done in 0.130396s
+
+Parallel HSS triangular solution...
+Done in 0.311671s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=0.752401
+Done in 0.100745s
+
+Iterative refinement of the solution...
+Step 0: err = 0.752401
+Step 1: err = 0.0208718
+Step 2: err = 0.000114952
+Step 3: err = 3.35921e-06
+Step 4: err = 1.75968e-08
+Step 5: err = 5.24114e-10
+Step 6: err = 2.63817e-11
+Done in 3.07657s
+
+Statistics: 
+
+Time spent in compression:    32.1354 (s)
+Time spent in initial distrib:5.22022 (s)
+Random number generation:     min= 0 (s); avg=0.00397277 (s); max=0.110462 (s)
+Global sample GEMMs:          min= 0 (s); avg=9.76493 (s); max=10.4525 (s)
+Interpolative decompositions: min= 0.307749 (s); avg=0.82595 (s); max=0.968114 (s)
+Flops for compression (GFlops): min= 0.0434082; avg= 54.727; max= 57.7488; total= 10507.6
+HSS factors (MB): min= 0.206874; avg= 0.30272; max= 0.413877; total= 58.1222
+
+Time spent in factorization: 0.130396 (s)
+Flops for factorization (GFlops): min= 0.00835935; avg= 0.0185491; max= 0.0217541; total= 3.56143
+ULV factors (MB): min= 0.527154; avg= 0.789281; max= 1.07154; total= 151.542
+
+Cumulated time in solution steps: 2.10177 (s)
+Cumulated flops in solution steps (GFlops): min= 0.000921905; avg= 0.00142957; max= 0.00191657; total= 0.274477
+
+Cumulated time in matrix-vector products: 142.184 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 3.86934; avg= 6.68309; max= 8.93411; total= 1283.15
+\end{verbatim}
+
+Also need to do the plain lapack case:
+
+\begin{verbatim}
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning; compression routine was called but HSS is off (use_HSS=false). Nothing to do.
+
+Done in 5.96046e-06s; max rank = 0; effective number of random vectors = 0
+
+Warning; compression checking routine was called but HSS is off (use_HSS=false). Nothing to do.
+Done in 3.09944e-06s
+
+Factorization with ScaLAPACK...
+Done in 306.272s
+
+Triangular solution with ScaLAPACK...
+Done in 0.320943s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=4.30547e-10
+Done in 0.099966s
+
+Iterative refinement of the solution...
+Step 0: err = 4.30547e-10
+Step 1: err = 3.66442e-11
+Done in 0.637296s
+
+Statistics: 
+
+Flops for factorization (GFlops): min= 0; avg= 1777.78; max= 1875.46; total= 341333
+LU factors (MB): min= 0; avg= 254.313; max= 268.286; total= 48828.1
+
+Cumulated time in solution steps: 0.667052 (s)
+Cumulated flops in solution steps (GFlops): min= 0; avg= 0.133333; max= 0.140659; total= 25.6
+
+Cumulated time in matrix-vector products: 0.391008 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 0; avg= 0.266667; max= 0.281319; total= 51.2
+\end{verbatim}
+
+These numbers are roughly in line with Table III.\@  Assuming that
+ScaLAPACK scales nearly perfectly we get about 3x faster
+factorization time on 192 cores than on 64 cores (which is what
+was used in table III).  This would suggest that table III was
+indeed generated on Edison.
+
 
 \if 0
 Get an interactive job:
