@@ -1,0 +1,40 @@
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 13 levels in the tree...
+Done in 18.9868s; max rank = 171; effective number of random vectors = 250
+
+Parallel ULV factorization...
+Done in 0.0411739s
+
+Parallel HSS triangular solution...
+Done in 0.099304s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=0.000211134
+Done in 0.236843s
+
+Iterative refinement of the solution...
+Step 0: err = 0.000211134
+Step 1: err = 2.13759e-09
+Done in 0.792194s
+
+Statistics: 
+
+Time spent in compression:    18.9868 (s)
+Time spent in initial distrib:8.61522 (s)
+Random number generation:     min= 0.00669312 (s); avg=0.00851544 (s); max=0.0156631 (s)
+Global sample GEMMs:          min= 8.02693 (s); avg=8.04259 (s); max=8.05633 (s)
+Interpolative decompositions: min= 0.0604489 (s); avg=0.0958796 (s); max=0.105183 (s)
+Flops for compression (GFlops): min= 100.166; avg= 100.176; max= 100.178; total= 6411.24
+HSS factors (MB): min= 0.864591; avg= 0.913723; max= 0.924402; total= 58.4783
+
+Time spent in factorization: 0.0411739 (s)
+Flops for factorization (GFlops): min= 0.0181182; avg= 0.0222079; max= 0.0230282; total= 1.42131
+ULV factors (MB): min= 2.30996; avg= 2.44417; max= 2.4832; total= 156.427
+
+Cumulated time in solution steps: 0.189017 (s)
+Cumulated flops in solution steps (GFlops): min= 0.00123306; avg= 0.00129457; max= 0.00131249; total= 0.0828525
+
+Cumulated time in matrix-vector products: 0.939204 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 0.8; avg= 0.8; max= 0.8; total= 51.2

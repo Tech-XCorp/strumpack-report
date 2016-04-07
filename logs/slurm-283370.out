@@ -1,0 +1,34 @@
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning; compression routine was called but HSS is off (use_HSS=false). Nothing to do.
+
+Done in 5.96046e-06s; max rank = 0; effective number of random vectors = 0
+
+Warning; compression checking routine was called but HSS is off (use_HSS=false). Nothing to do.
+Done in 3.09944e-06s
+
+Factorization with ScaLAPACK...
+Done in 306.272s
+
+Triangular solution with ScaLAPACK...
+Done in 0.320943s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=4.30547e-10
+Done in 0.099966s
+
+Iterative refinement of the solution...
+Step 0: err = 4.30547e-10
+Step 1: err = 3.66442e-11
+Done in 0.637296s
+
+Statistics: 
+
+Flops for factorization (GFlops): min= 0; avg= 1777.78; max= 1875.46; total= 341333
+LU factors (MB): min= 0; avg= 254.313; max= 268.286; total= 48828.1
+
+Cumulated time in solution steps: 0.667052 (s)
+Cumulated flops in solution steps (GFlops): min= 0; avg= 0.133333; max= 0.140659; total= 25.6
+
+Cumulated time in matrix-vector products: 0.391008 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 0; avg= 0.266667; max= 0.281319; total= 51.2

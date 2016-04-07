@@ -1,0 +1,19 @@
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 4 levels in the tree...
+Done in 10.7446s; max rank = 25; effective number of random vectors = 30
+
+Checking compression quality by computing HSS(A)*I-A...
+srun: error: nid00253: task 14: Killed
+srun: Terminating job step 283304.0
+slurmstepd: *** STEP 283304.0 ON nid00253 CANCELLED AT 2016-03-28T09:40:34 ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: error: nid00264: tasks 90,92,94: Killed
+srun: error: nid00264: tasks 91,93,95: Killed
+srun: error: nid00264: task 78: Killed
+srun: error: nid00254: tasks 24,26,30,32,38: Killed
+srun: error: nid00253: tasks 0-13,15-23: Killed
+srun: error: nid00264: tasks 72-77,79-89: Killed
+srun: error: nid00255: tasks 48-71: Killed
+srun: error: nid00254: tasks 25,27-29,31,33-37,39-47: Killed

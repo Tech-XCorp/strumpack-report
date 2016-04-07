@@ -1,0 +1,74 @@
+SLURM_CHECKPOINT_IMAGE_DIR=/var/slurm/checkpoint
+SLURM_NODELIST=nid000[31-34]
+SLURM_JOB_NAME=solve_run.slurm
+SLURMD_NODENAME=nid00031
+SLURM_TOPOLOGY_ADDR=nid00031
+SLURM_PRIO_PROCESS=0
+SLURM_ROOT=/opt/slurm/default
+SLURM_NODE_ALIASES=(null)
+SLURM_JOB_QOS=debug
+SLURM_TOPOLOGY_ADDR_PATTERN=node
+SLURM_NNODES=4
+SLURM_JOBID=311714
+SLURM_TASKS_PER_NODE=48(x4)
+SLURM_JOB_ID=311714
+SLURM_JOB_USER=dmeiser
+SLURM_JOB_UID=56224
+SLURM_NODEID=0
+SLURM_SUBMIT_DIR=/global/project/projectdirs/mp127/strumpack/STRUMPACK-Dense-1.1.1/examples
+SLURM_TASK_PID=48748
+SLURM_CPUS_ON_NODE=48
+SLURM_PROCID=0
+SLURM_JOB_NODELIST=nid000[31-34]
+SLURM_LOCALID=0
+SLURM_JOB_CPUS_PER_NODE=48(x4)
+SLURM_CLUSTER_NAME=edison
+SLURM_GTIDS=0
+SLURM_SUBMIT_HOST=edison03
+SLURM_JOB_PARTITION=debug
+SLURM_JOB_ACCOUNT=m327
+SLURM_JOB_NUM_NODES=4
+SLURM_MEM_PER_NODE=64523
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 13 levels in the tree...
+Done in 16.9205s; max rank = 121; effective number of random vectors = 150
+
+Parallel ULV factorization...
+Done in 0.031579s
+
+Parallel HSS triangular solution...
+Done in 0.0745161s
+
+Checking solution...
+Relative residual: ||A*x-b||_fro/||b||_fro=3.41175
+Done in 0.235031s
+
+Iterative refinement of the solution...
+Step 0: err = 3.41175
+Step 1: err = 0.421383
+Step 2: err = 0.010899
+Step 3: err = 0.000765273
+Step 4: err = 4.11625e-05
+Done in 2.4114s
+
+Statistics: 
+
+Time spent in compression:    16.9205 (s)
+Time spent in initial distrib:8.45694 (s)
+Random number generation:     min= 0.00418591 (s); avg=0.00542187 (s); max=0.015614 (s)
+Global sample GEMMs:          min= 6.47273 (s); avg=6.48301 (s); max=6.49045 (s)
+Interpolative decompositions: min= 0.0517294 (s); avg=0.0700545 (s); max=0.073431 (s)
+Flops for compression (GFlops): min= 60.0558; avg= 60.0585; max= 60.0594; total= 3843.75
+HSS factors (MB): min= 0.53379; avg= 0.558903; max= 0.566264; total= 35.7698
+
+Time spent in factorization: 0.031579 (s)
+Flops for factorization (GFlops): min= 0.00781373; avg= 0.00940244; max= 0.0101018; total= 0.601756
+ULV factors (MB): min= 1.29162; avg= 1.35075; max= 1.38497; total= 86.4482
+
+Cumulated time in solution steps: 0.379733 (s)
+Cumulated flops in solution steps (GFlops): min= 0.00163419; avg= 0.00172353; max= 0.0017667; total= 0.110306
+
+Cumulated time in matrix-vector products: 2.34086 (s)
+Cumulated flops in matrix-vector products (GFlops): min= 2; avg= 2; max= 2; total= 128

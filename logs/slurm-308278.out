@@ -1,0 +1,24 @@
+STRUMPACK Dense Package version 1.1.1, real double precision arithmetic.
+
+Warning: both block_HSS and levels_HSS are defined; block_HSS is ignored
+Parallel HSS compression with 13 levels in the tree...
+Done in 18.7445s; max rank = 175; effective number of random vectors = 250
+
+Checking compression quality by computing HSS(A)*I-A...
+xxmr2d:out of memory
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+srun: error: nid00213: task 10: Exited with exit code 2
+srun: Terminating job step 308278.0
+srun: error: nid00213: task 11: Aborted
+slurmstepd: *** STEP 308278.0 ON nid00213 CANCELLED AT 2016-04-04T15:25:36 ***
+srun: Job step aborted: Waiting up to 32 seconds for job step to finish.
+srun: error: nid00213: tasks 0,2,4,6,8,12,14: Killed
+srun: error: nid00216: tasks 48,50,52,54,56,58,60,62: Killed
+srun: error: nid00214: tasks 20,22,26,28,30: Killed
+srun: error: nid00215: tasks 32,34,36,38,40,42,44,46: Killed
+srun: error: nid00213: tasks 3,5,7,9,13,15: Killed
+srun: error: nid00216: tasks 49,51,53,55,57,59,61,63: Killed
+srun: error: nid00215: tasks 33,35,37,39,41,43,45,47: Killed
+srun: error: nid00214: tasks 16-19,21,23-25,27,29,31: Killed
+srun: error: nid00213: task 1: Killed
