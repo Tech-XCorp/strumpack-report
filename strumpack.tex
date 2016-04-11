@@ -169,11 +169,13 @@ the adaptive sampling algorithm and use a fixed number of
 vectors, 250 in the example above.  The number of sampling
 vectors is adjusted for the different tolerances $\epsilon$ since
 the maximum rank depends on the precision of the reduced rank
-representation.  The parameter \verb!sdp.steps_IR! determines the
-maximum number of iterations used for iterative refinement and
-\verb!sdp.tol_IR!  specifies the precision to which the linear
-system is being solved.  Reporting of performance numbers relies
-on the \verb!sdp.print_statistics()! function.
+representation.  The number of sampling vectors is indicated in
+table~\cite{table:QChemToeplitz} for each $\epsilon$.  The
+parameter \verb!sdp.steps_IR! determines the maximum number of
+iterations used for iterative refinement and \verb!sdp.tol_IR!
+specifies the precision to which the linear system is being
+solved.  Reporting of performance numbers relies on the
+\verb!sdp.print_statistics()! function.
 
 Initially we run with verification of compression enabled.  This
 is a very memory intensive operation and thus requires more
@@ -197,13 +199,13 @@ of~\cite{rouet:strumpack} replicated.
     indicate times in seconds.  The timings
     from~\cite{rouet:strumpack} are indicated in parenthesis.}
 \label{table:QChemToeplitz}
-  \begin{tabular}{ccccc}
+  \begin{tabular}{cccccc}
 \toprule
-$\epsilon$ & Max.\@ rank & Compression & Factorization & Solution + IR\\
+$\epsilon$ & \# Rand. Vecs & Max.\@ rank & Compression & Factorization & Solution + IR\\
 \midrule
-    \SI{1.0e-8} & 171 (169) & 19.0 (19.0) & 0.04 (0.04) & 0.2 (1.5)\\
-    \SI{1.0e-6} & 147 (147) & 18.2 (17.6) & 0.07 (0.03) & 0.7 (2.0)\\
-    \SI{1.0e-4} & 121 (120) & 16.9 (16.7) & 0.04 (0.02) & 0.4 (5.6)\\
+    \SI{1.0e-8} & 250 & 171 (169) & 19.0 (19.0) & 0.04 (0.04) & 0.2 (1.5)\\
+    \SI{1.0e-6} & 200 & 147 (147) & 18.2 (17.6) & 0.07 (0.03) & 0.7 (2.0)\\
+    \SI{1.0e-4} & 150 & 121 (120) & 16.9 (16.7) & 0.04 (0.02) & 0.4 (5.6)\\
 \bottomrule
   \end{tabular}
 \end{table}
@@ -215,11 +217,10 @@ $\epsilon$ & Max.\@ rank & Compression & Factorization & Solution + IR\\
 Besides the timing results we also made sure that the maximum
 rank reported by strumpack agrees with~\cite{rouet:strumpack}.
 We find that in our runs the maximum rank is within 1\% of the
-ranks reported in~\cite{rouet:strumpack}.  We have not been able
-to determine the cause of the small discrepancies between the
-ranks reported in our runs and~\cite{rouet:strumpack} in the case
-of $\epsilon=$\SI{1.0e-8}.  But the two are certainly very close
-to one another.
+ranks reported in~\cite{rouet:strumpack}.  The maximum rank
+obtained depends on the random sampling vectors.  As the sampling
+vectors are not identical from run to run it is not surprising
+that there are small variations.
 
 
 \section{Replication of strong scaling results}
@@ -235,8 +236,32 @@ CC driver.cpp -I ${STRUMPACK_SRC_DIR}
 \end{verbatim}
 The directory \verb!STRUMPACK_SRC_DIR! is the directory in which
 the \strumpack{} sources are locate.  The driver program loads
-the matrices from Francois' scratch directory on Edison.  The
+the matrices from Rouet's scratch directory on Edison.  The
 matrices are stored in a proprietary binary format.
+
+The timing results for the different stages of the solution
+process are shown in Fig.~\ref{fig:strongscaling}.  For this run
+we use 6000 random vectors for the random sampling space and the
+depth of the HSS tree is 6.  The equations are solved to a
+precision of $\epsilon=$\SI{1.0e-4}.  We use the
+timing measurements as reported by \verb~driver.cpp~.
+While we are not sure how to compute the total solution times
+reported in~\cite{rouet:strumpack} our results are at least in
+qualitative agreement.  The compression, factorization, and
+matrix vector multiplication strong scale well to 2048 MPI process.
+The solution kernel does not scale well which is not surprising
+given the long critical path of this computation.
+\begin{figure}
+  \begin{center}
+  \includegraphics[width=0.5\textwidth]{strong_scaling}
+  \end{center}
+  \caption{Strong scaling of various stages of the solution of an
+  electromagnetic boundary element problem with \strumpack{}.
+  ``compr.'' refers to the HSS compression, ``ULV'' to the
+  factorization,  and ``solution'' and ``matvec'' are statistics
+  for the solution stage and matrix vector products.}
+  \label{fig:strongscaling}
+\end{figure}
 
 
 \section{Conclusion}
