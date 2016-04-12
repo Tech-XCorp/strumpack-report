@@ -10,14 +10,15 @@
 \SetAlCapHSkip{0pt}
 \IncMargin{-\parindent}
 
+
 \newcommand{\dmcomment}[1]{\textbf{#1}}
 
 
 \begin{document}
 
 \title{Replicated Computational Results (RCR) Report for
-  \textit{A distributed-memory package for dense Hierarchically
-    Semi-Separable matrix computations using randomization}}
+  ``A distributed-memory package for dense Hierarchically
+    Semi-Separable matrix computations using randomization''}
 
 \author{Dominic Meiser
 \affil{Tech-X Corporation, 5621 Arapahoe Avenue, Boulder CO, 80303, USA.}
@@ -36,33 +37,35 @@
 
 \section{Introduction}
 
-The article~\cite{rouet:strumpack} presents details of a newly
-developed library, \strumpack, for the construction of
-hierarchically semi-separable matrices and for arithmetic with
-these matrices.  Among other things,  \strumpack{} can convert
-ordinary dense matrices into a hierarchical matrix.  Compression
-is achieved by means of a low rank approximation for sub blocks
-of the matrix.  The resulting hierarchical matrix can then be
-factored efficiently and the factorization can be used to solve
-linear systems with the original matrix.  All of this
-functionality is available in a distributed memory architecture
-using MPI.
+Rouet et al. present details of a newly developed library,
+\strumpack{}, for the construction of hierarchically
+semi-separable matrices and for arithmetic with these
+matrices~\cite{rouet:strumpack}.  Among other things,
+\strumpack{} provides facilities to convert ordinary dense
+matrices into a hierarchical matrix format.  Compression is
+achieved by means of a low rank approximation for sub blocks of
+the matrix.  \strumpack{} provides functions to factor the
+resulting hierarchical matrix into a form suitable for efficient
+solution and thus provides a means to create pre-conditioners for
+dense matrix problems.  All of this functionality is available in
+a distributed memory architecture based on MPI.
 
-In this report we replicate some of the computational results
-presented in~\cite{rouet:strumpack}.  We focus compression,
-factorization, and solve performance reported in Table III
-of~\cite{rouet:strumpack}.  We also check the strong scaling
-results reported in~Fig.~10 in~\cite{rouet:strumpack}.
+In this report we replicate a representative subset of the
+computational results presented by Rouet et al.  We focus on
+compression, factorization, and solver performance reported in
+Table III of~\cite{rouet:strumpack}.  We also replicate the
+strong scaling results reported in~Fig.~10
+in that paper.
 
 Specifically, we carry out the following steps:
 \begin{enumerate}
-  \item Download \strumpack{} distribution package.
+  \item Download the \strumpack{} distribution package.
   \item Build \strumpack{} on a laptop.
-  \item Build \strumpack{} on Edison~\cite{Edison} at NERSC.
+  \item Build \strumpack{} on Edison at NERSC.
   \item Run \strumpack{} on Edison to replicate performance
     measurements for QChem Toeplitz matrix and to check strong
-    scaling for a dense matrix from boundary element formulation
-    of an electromagnetic scattering problem..
+    scaling for a dense matrix from a boundary element formulation
+    of an electromagnetic scattering problem.
 \end{enumerate}
 
 The following sections provide details on these steps.
@@ -76,7 +79,7 @@ in an environment that we have complete control over before
 attempting to do the same on an expensive computer like Edison.
 Additionally, this provides confidence that \strumpack{} can be
 used on generic computers and not just in the specific
-environment used in~\cite{rouet:strumpack}.
+environment used by Rouet et al.
 
 We obtain the sources from the \strumpack{} distribution website,
 \begin{verbatim}
@@ -92,22 +95,27 @@ algorithms, and an API reference.  A readme file
 provides concise instructions on how to build \strumpack{}.
 
 \strumpack{}'s third party library requirements are rather
-minimal: MPI, BLAS/LAPACK, and ScaLAPACK.  For our laptop builds
+minimal: MPI, BLAS, LAPACK, and ScaLAPACK.  For our laptop builds
 We satisfy these requirements as follows:
 \begin{itemize}
-\item MPI:\@ mpich  3.1.4
-\item BLAS/LAPACK:\@ binary distribution on centos 6
-\item ScaLAPACK:\@ Reference implementation from netlib~\cite{netlib}
+\item For MPI we use mpich version 3.1.4.
+\item For BLAS and LAPACK we use the binary distribution on
+the centos 6 linux distribution (rpm packages
+\verb!blas-3.2.1-4.el6.x86_64!,
+\verb!blas-devel-3.2.1-4.el6.x86_64!,
+\verb!lapack-3.2.1-4.el6.x86_64!, and
+\verb!lapack-devel-3.2.1-4.el6.x86_64!).
+\item For ScaLAPACK we use version 2.0.2 from netlib~\cite{netlib}.
 \end{itemize}
-
 All code is compiled with gcc version 4.9.3.
 
-\strumpack{}'s build system consists of makefiles.  They are
+\strumpack{}'s build system consists of gnu makefiles.  The
+makefiles are
 customized by writing a Makefile.inc that defines system specific
-variables.  Template Makefile.inc files are provided for gnu
-based linux systems, edison, and hopper.  To build on our laptop
-we modify Makefile.gnu to point to our mpi, blas, lapack, and
-scalapack installation.  With these modifications we successfully
+variables.  Examples of Makefile.inc files are provided for gnu
+based linux systems, Edison, and Hopper.  To build on our laptop
+we modify Makefile.gnu to point to our MPIO, BLAS, LAPACK, and
+ScaLAPACK installation.  With these modifications we successfully
 build the C++, C, and Fortran examples.  We don't verify building
 of the matlab bindings because our laptop does not have matlab
 installed.  We are able to execute all example binaries and the
@@ -120,11 +128,11 @@ The majority of the performance results reported
 in~\cite{rouet:strumpack} were obtained on Edison~\cite{Edison} at
 NERSC.\@ To build \strumpack{} on Edison we use the default intel
 programming environment, \verb!PrgEnv-intel/5.2.56!  with version
-15.0.1 20141023 of the intel compilers, with module
+15.0.1 20141023 of the intel compilers, and with module
 \verb!cray-mpich/7.3.1! for MPI support.  The template
 \verb!Makefile.edison! provided with the source distribution of
-STRUMPACK works without modifications with these modules.  This
-compiles all sources with \verb!-O3!.
+STRUMPACK works without modifications with these modules.  The
+Makefile.edison file compiles all sources with \verb!-O3!.
 
 
 \section{Performance on Edison}
@@ -138,9 +146,9 @@ of parameters.  We set the problem size to \verb!n=80,000! and
 change the number of right hand sides to \verb!nrhs=1!.  Details
 of the computation are controlled via options of the
 computational object \verb!sdp! of type
-\verb!StrumpackDensePackage!.  After discussion with the authors
-of~\cite{rouet:strumpack} we configure \verb!sdp! as follows to
-match the settings used in~\cite{rouet:strumpack}:
+\verb!StrumpackDensePackage!.  After discussion with Rouet et
+al.\ we configure \verb!sdp! as follows to match the settings used
+in~\cite{rouet:strumpack}:
 \begin{verbatim}
 sdp.use_HSS=true;
 sdp.tol_HSS=1e-8;
@@ -156,7 +164,7 @@ The setting \verb!sdp.use_HSS=true! specifies that HSS
 compression be used.  By setting this parameter to false it is
 possible to test the solution of the system via ScaLAPACK instead
 of \strumpack{}.  The parameter \verb!sdp.tol_HSS! sets
-$\epsilon$ in Table III in~\cite{rouet:strumpack}.
+$\epsilon$ in Table III in~\cite{rouet:strumpack}.  The parameter
 \verb!sdp.levels_HSS! specifies the maximum number of levels in
 the HSS tree.  The parameters \verb!sdp.min_rand_HSS!,
 \verb!sdp.lim_rand_HSS!, \verb!sdp.inc_rand_HSS!, and
@@ -170,37 +178,47 @@ vectors, 250 in the example above.  The number of sampling
 vectors is adjusted for the different tolerances $\epsilon$ since
 the maximum rank depends on the precision of the reduced rank
 representation.  The number of sampling vectors is indicated in
-table~\cite{table:QChemToeplitz} for each $\epsilon$.  The
+table~\ref{table:QChemToeplitz} for each $\epsilon$.  The
 parameter \verb!sdp.steps_IR! determines the maximum number of
 iterations used for iterative refinement and \verb!sdp.tol_IR!
 specifies the precision to which the linear system is being
 solved.  Reporting of performance numbers relies on the
-\verb!sdp.print_statistics()! function.
+function \verb!sdp.print_statistics()!.
 
-Initially we run with verification of compression enabled.  This
-is a very memory intensive operation and thus requires more
-compute nodes than were used in~\cite{rouet:strumpack}.  After
-verifying the accuracy of the compression we disable this
-verification feature and reduce the number of nodes to the
-configuration used in~\cite{rouet:strumpack}.  Specifically, we
-use four compute nodes with 16 MPI processes on each of them.
+Initially we run the \verb!solve! driver in a mode where the
+precision of the compressed matrix is verified.  The verification
+of the compression is a very memory intensive operation and thus
+requires more compute nodes than were used
+in~\cite{rouet:strumpack}.  After successfully verifying the
+accuracy of the compression we disable the verification feature
+and reduce the number of nodes to the configuration used
+in~\cite{rouet:strumpack}.  Specifically, we use four compute
+nodes with 16 MPI processes on each of them.
 
 Our performance results are shown in
 table~\ref{table:QChemToeplitz} along with the results reported
-in~\cite{rouet:strumpack}.  The timings we obtain for the
-compression step are very close to the results reported
+in~\cite{rouet:strumpack} for comparison.  The timings we obtain
+for the compression step are very close to the results reported
 in~\cite{rouet:strumpack}.  The timings for factorization and
 solution vary a bit.  But because these stages are only fractions
 of a second long they are much more susceptible to fluctuations.
-We find that they are close enough to consider the results
-of~\cite{rouet:strumpack} replicated.
+In our estimation the timing results are close enough to consider
+the results of~\cite{rouet:strumpack} replicated.
 \begin{table}
-  \tbl{Summary of performance measurements.  All numbers indicate times
-    in seconds.  The timings from~\cite{rouet:strumpack} are indicated
-    in parenthesis.}{
+  \tbl{Summary of performance measurements.  All numbers indicate
+    times in seconds.  The timings from~\cite{rouet:strumpack} are
+    indicated in parenthesis.  The column labeled \# Rand.\ Vecs
+    indicates the number of sampling vectors used for the
+    compression, Max.\ rank indicates the maximum rank for any
+    sub-block estimated by \strumpack{} for the given level of
+    accuracy, Compression lists the times consumed for HSS
+    compression, Factorization the time for computing the ULV
+    factorization of the compressed matrices, and Solution + IR is
+    the time for solution and iterative refinement.  All times are in
+    seconds.}{
   \begin{tabular}{cccccc}
 \toprule
-$\epsilon$ & \# Rand. Vecs & Max.\ rank & Compression & Factorization & Solution + IR\\
+$\epsilon$ & \# Rand.\ Vecs & Max.\ rank & Compression & Factorization & Solution + IR\\
 \midrule
     \SI{1.0e-8} & 250 & 171 (169) & 19.0 (19.0) & 0.04 (0.04) & 0.2 (1.5)\\
     \SI{1.0e-6} & 200 & 147 (147) & 18.2 (17.6) & 0.07 (0.03) & 0.7 (2.0)\\
@@ -212,11 +230,11 @@ $\epsilon$ & \# Rand. Vecs & Max.\ rank & Compression & Factorization & Solution
 \end{table}
 \dmcomment{Sherry, Francois, I think I'm getting very different
   times for the solution step because I'm solving to a smaller
-  accuracy (sdp.tol\_IR in the code).  Could you confirm that,
-  please?  What should I use for sdp.tol\_IR?}
+  accuracy (sdp.tol\_IR in the code).  I use
+  sdp.tol\_IR=sdp.tol\_HSS.  What should I use for sdp.tol\_IR?}
 
 Besides the timing results we also made sure that the maximum
-rank reported by strumpack agrees with~\cite{rouet:strumpack}.
+rank reported by \strumpack{} agrees with~\cite{rouet:strumpack}.
 We find that in our runs the maximum rank is within 1\% of the
 ranks reported in~\cite{rouet:strumpack}.  The maximum rank
 obtained depends on the random sampling vectors.  As the sampling
@@ -227,16 +245,15 @@ that there are small variations.
 \section{Replication of strong scaling results}
 
 To replicate the strong scaling performance reported in Fig.~10
-in~\cite{rouet:strumpack} we use the same example program,
-\verb!driver.cpp! provided by the authors
-of~\cite{rouet:strumpack}.  This executable is not part of the
-release distribution of~\cite{rouet:strumpack}.  We build it on Edison
-using
+in~\cite{rouet:strumpack} we use the program, \verb!driver.cpp!,
+that was used by Rouet et al for that study.  This executable is
+not part of the release distribution of~\cite{rouet:strumpack}.
+We build it on Edison using
 \begin{verbatim}
 CC driver.cpp -I ${STRUMPACK_SRC_DIR}
 \end{verbatim}
 The directory \verb!STRUMPACK_SRC_DIR! is the directory in which
-the \strumpack{} sources are locate.  The driver program loads
+the \strumpack{} sources are located.  The driver program loads
 the matrices from Rouet's scratch directory on Edison.  The
 matrices are stored in a proprietary binary format.
 
@@ -244,14 +261,15 @@ The timing results for the different stages of the solution
 process are shown in Fig.~\ref{fig:strongscaling}.  For this run
 we use 6000 random vectors for the random sampling space and the
 depth of the HSS tree is 6.  The equations are solved to a
-precision of $\epsilon=$\SI{1.0e-4}.  We use the
-timing measurements as reported by \verb~driver.cpp~.
-While we are not sure how to compute the total solution times
-reported in~\cite{rouet:strumpack} our results are at least in
-qualitative agreement.  The compression, factorization, and
-matrix vector multiplication strong scale well to 2048 MPI process.
-The solution kernel does not scale well which is not surprising
-given the long critical path of this computation.
+precision of $\epsilon=$\SI{1.0e-4}.  We use the timing
+measurements as reported by \verb~driver.cpp~.  While we are not
+sure how to compute the total solution times reported
+in~\cite{rouet:strumpack} from the application logs, our results
+are at least in qualitative agreement.  The compression,
+factorization, and matrix vector multiplication strong scale well
+to 2048 MPI process.  The solution kernel does not scale well
+which is not surprising given the small amount of parallelism
+that can be exploited by this computation.
 \begin{figure}
   \begin{center}
   \includegraphics[width=0.5\textwidth]{strong_scaling}
@@ -278,13 +296,13 @@ element problem.
 
 \section{Acknowledgements}
 
-We would like to thank Francois-Henry Rouet and Xiaoye S. Li for
+We would like to thank Fran\cois-Henry Rouet and Xiaoye S. Li for
 valuable feedback and discussion and M. Heroux for guidance.
 This research used resources of the National Energy Research
 Scientific Computing Center, which is supported by the Office of
 Science of the U. S. Department of Energy under Contract No. ???
 \dmcomment{Hi Sherry, what contract should I acknowledge for
-  mp127 time? Thanks.}
+mp127 time? Thanks.}
 
 \bibliographystyle{abbrv}
 \bibliography{strumpack}
