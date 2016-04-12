@@ -195,19 +195,20 @@ of a second long they are much more susceptible to fluctuations.
 We find that they are close enough to consider the results
 of~\cite{rouet:strumpack} replicated.
 \begin{table}
-  \caption{Summary of performance measurements.  All numbers
-    indicate times in seconds.  The timings
-    from~\cite{rouet:strumpack} are indicated in parenthesis.}
-\label{table:QChemToeplitz}
+  \tbl{Summary of performance measurements.  All numbers indicate times
+    in seconds.  The timings from~\cite{rouet:strumpack} are indicated
+    in parenthesis.}{
   \begin{tabular}{cccccc}
 \toprule
-$\epsilon$ & \# Rand. Vecs & Max.\@ rank & Compression & Factorization & Solution + IR\\
+$\epsilon$ & \# Rand. Vecs & Max.\ rank & Compression & Factorization & Solution + IR\\
 \midrule
     \SI{1.0e-8} & 250 & 171 (169) & 19.0 (19.0) & 0.04 (0.04) & 0.2 (1.5)\\
     \SI{1.0e-6} & 200 & 147 (147) & 18.2 (17.6) & 0.07 (0.03) & 0.7 (2.0)\\
     \SI{1.0e-4} & 150 & 121 (120) & 16.9 (16.7) & 0.04 (0.02) & 0.4 (5.6)\\
 \bottomrule
   \end{tabular}
+    }
+\label{table:QChemToeplitz}
 \end{table}
 \dmcomment{Sherry, Francois, I think I'm getting very different
   times for the solution step because I'm solving to a smaller
