@@ -37,7 +37,7 @@
 
 \section{Introduction}
 
-Rouet et al. present details of a newly developed library,
+Rouet et al.\ present details of a newly developed library,
 \strumpack{}, for the construction of hierarchically
 semi-separable matrices and for arithmetic with these
 matrices~\cite{rouet:strumpack}.  Among other things,
@@ -75,11 +75,10 @@ The following sections provide details on these steps.
 
 To verify that we could build the package we first get it to run
 on a laptop.  This allows us to iron out any issues ahead of time
-in an environment that we have complete control over before
-attempting to do the same on an expensive computer like Edison.
-Additionally, this provides confidence that \strumpack{} can be
-used on generic computers and not just in the specific
-environment used by Rouet et al.
+in a controlled environment before attempting to do the same on
+an expensive computer like Edison.  Additionally, this provides
+confidence that \strumpack{} can be used on generic computers and
+not just in the specific environment used by Rouet et al.
 
 We obtain the sources from the \strumpack{} distribution website,
 \begin{verbatim}
@@ -95,8 +94,8 @@ algorithms, and an API reference.  A readme file
 provides concise instructions on how to build \strumpack{}.
 
 \strumpack{}'s third party library requirements are rather
-minimal: MPI, BLAS, LAPACK, and ScaLAPACK.  For our laptop builds
-We satisfy these requirements as follows:
+minimal: MPI, BLAS, LAPACK, and ScaLAPACK.\@ For our laptop
+builds We satisfy these requirements as follows:
 \begin{itemize}
 \item For MPI we use mpich version 3.1.4.
 \item For BLAS and LAPACK we use the binary distribution on
@@ -110,16 +109,16 @@ the centos 6 linux distribution (rpm packages
 All code is compiled with gcc version 4.9.3.
 
 \strumpack{}'s build system consists of gnu makefiles.  The
-makefiles are
-customized by writing a Makefile.inc that defines system specific
-variables.  Examples of Makefile.inc files are provided for gnu
-based linux systems, Edison, and Hopper.  To build on our laptop
-we modify Makefile.gnu to point to our MPIO, BLAS, LAPACK, and
-ScaLAPACK installation.  With these modifications we successfully
-build the C++, C, and Fortran examples.  We don't verify building
-of the matlab bindings because our laptop does not have matlab
-installed.  We are able to execute all example binaries and the
-output from them looks plausible.
+makefiles are customized by writing a Makefile.inc that defines
+system specific variables.  Examples of Makefile.inc files are
+provided for gnu based linux systems, Edison, and Hopper.  To
+build on our laptop we modify Makefile.gnu to point to our MPI,
+BLAS, LAPACK, and ScaLAPACK installation.  With these
+modifications we successfully build the C++, C, and Fortran
+examples.  We don't verify building of the matlab bindings
+because our laptop does not have matlab installed.  We are able
+to execute all example binaries and the output from them looks
+plausible.
 
 
 \section{Building on Edison}
@@ -138,17 +137,16 @@ Makefile.edison file compiles all sources with \verb!-O3!.
 \section{Performance on Edison}
 
 We use the example \verb!solve.cpp! to reproduce the results for
-the QChem Toeplitz matrices in Table~III
-in~\cite{rouet:strumpack}.  Currently there is no mechanism to
-control the example program via command line options.  Thus we
-modify the \verb!solve.cpp! source code and rebuild for every set
-of parameters.  We set the problem size to \verb!n=80,000! and
-change the number of right hand sides to \verb!nrhs=1!.  Details
-of the computation are controlled via options of the
-computational object \verb!sdp! of type
-\verb!StrumpackDensePackage!.  After discussion with Rouet et
-al.\ we configure \verb!sdp! as follows to match the settings used
-in~\cite{rouet:strumpack}:
+the QChem Toeplitz matrix in Table~III in~\cite{rouet:strumpack}.
+Currently there is no mechanism to control the example program
+via command line options.  Thus we modify the \verb!solve.cpp!
+source code and rebuild for every set of parameters.  We set the
+problem size to \verb!n=80,000! and change the number of right
+hand sides to \verb!nrhs=1!.  Details of the computation are
+controlled via options of the computational object \verb!sdp! of
+type \verb!StrumpackDensePackage!.  After discussion with Rouet
+et al.\ we configure \verb!sdp! as follows to match the settings
+used in~\cite{rouet:strumpack}:
 \begin{verbatim}
 sdp.use_HSS=true;
 sdp.tol_HSS=1e-8;
@@ -174,16 +172,16 @@ vectors used for the construction of the HSS matrix in
 vectors equal to one another,
 \verb!sdp.min_rand_HSS==sdp.max_rand_HSS!, we effectively disable
 the adaptive sampling algorithm and use a fixed number of
-vectors, 250 in the example above.  The number of sampling
-vectors is adjusted for the different tolerances $\epsilon$ since
-the maximum rank depends on the precision of the reduced rank
+vectors, 250 in our example.  The number of sampling vectors is
+adjusted for the different tolerances $\epsilon$ since the
+maximum rank depends on the precision of the reduced rank
 representation.  The number of sampling vectors is indicated in
 table~\ref{table:QChemToeplitz} for each $\epsilon$.  The
 parameter \verb!sdp.steps_IR! determines the maximum number of
 iterations used for iterative refinement and \verb!sdp.tol_IR!
 specifies the precision to which the linear system is being
-solved.  Reporting of performance numbers relies on the
-function \verb!sdp.print_statistics()!.
+solved.  Reporting of performance numbers relies on the function
+\verb!sdp.print_statistics()!.
 
 Initially we run the \verb!solve! driver in a mode where the
 precision of the compressed matrix is verified.  The verification
@@ -228,10 +226,6 @@ $\epsilon$ & \# Rand.\ Vecs & Max.\ rank & Compression & Factorization & Solutio
     }
 \label{table:QChemToeplitz}
 \end{table}
-\dmcomment{Sherry, Fran\c{}cois, I think I'm getting very different
-  times for the solution step because I'm solving to a smaller
-  accuracy (sdp.tol\_IR in the code).  I use
-  sdp.tol\_IR=sdp.tol\_HSS.  What should I use for sdp.tol\_IR?}
 
 Besides the timing results we also made sure that the maximum
 rank reported by \strumpack{} agrees with~\cite{rouet:strumpack}.
@@ -240,6 +234,14 @@ ranks reported in~\cite{rouet:strumpack}.  The maximum rank
 obtained depends on the random sampling vectors.  As the sampling
 vectors are not identical from run to run it is not surprising
 that there are small variations.
+
+We see much shorter times for solution and iterative refinement
+than what is reported by Rouet et al.  This is because we are
+using much larger solution tolerances,
+\verb~sdp.tol_IR=sdp.tol_HSS~.  Rouet et al. used
+\verb~sdp.tol_IR=1.0e-10~.  The timing difference in the solution
+step can reasonably be explained by this difference in requested
+solution accuracy.
 
 
 \section{Replication of strong scaling results}
@@ -260,16 +262,18 @@ matrices are stored in a proprietary binary format.
 The timing results for the different stages of the solution
 process are shown in Fig.~\ref{fig:strongscaling}.  For this run
 we use 6000 random vectors for the random sampling space and the
-depth of the HSS tree is 6.  The equations are solved to a
+depth of the HSS tree is six.  The equations are solved to a
 precision of $\epsilon=$\SI{1.0e-4}.  We use the timing
-measurements as reported by \verb~driver.cpp~.  While we are not
-sure how to compute the total solution times reported
-in~\cite{rouet:strumpack} from the application logs, our results
-are at least in qualitative agreement.  The compression,
+measurements as reported by \verb~driver.cpp~.  The compression,
 factorization, and matrix vector multiplication strong scale well
 to 2048 MPI process.  The solution kernel does not scale well
 which is not surprising given the small amount of parallelism
-that can be exploited by this computation.
+that can be exploited by this computation.  However, this is
+usually only a relatively small fraction of the total solution
+time.  Overall we find that \strumpack is slightly faster in our
+runs than the timings reported in~\cite{rouet:strumpack}.  We
+find good qualitative agreement in the scaling behavior between
+our results and Rouet et al.
 \begin{figure}
   \begin{center}
   \includegraphics[width=0.5\textwidth]{strong_scaling}
@@ -278,7 +282,8 @@ that can be exploited by this computation.
   electromagnetic boundary element problem with \strumpack{}.
   ``compr.'' refers to the HSS compression, ``ULV'' to the
   factorization,  and ``solution'' and ``matvec'' are statistics
-  for the solution stage and matrix vector products.}
+  for the solution stage and matrix vector products.  The dashed
+  lines indicate ideal scaling.}
   \label{fig:strongscaling}
 \end{figure}
 
@@ -296,13 +301,12 @@ element problem.
 
 \section{Acknowledgements}
 
-We would like to thank Fran\c{}ois-Henry Rouet and Xiaoye S. Li for
-valuable feedback and discussion and M. Heroux for guidance.
+We would like to thank Fran\c{}ois-Henry Rouet and Xiaoye S. Li
+for valuable feedback and discussion and M. Heroux for guidance.
 This research used resources of the National Energy Research
 Scientific Computing Center, which is supported by the Office of
-Science of the U. S. Department of Energy under Contract No. ???
-\dmcomment{Hi Sherry, what contract should I acknowledge for
-mp127 time? Thanks.}
+Science of the U. S. Department of Energy under Contract
+No. DE-AC02-05CH11231.
 
 \bibliographystyle{abbrv}
 \bibliography{strumpack}
