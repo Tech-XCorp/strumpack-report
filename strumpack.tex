@@ -38,17 +38,16 @@
 \section{Introduction}
 
 Rouet et al.\ present details of a newly developed library,
-\strumpack{}, for the construction of hierarchically
-semi-separable matrices and for arithmetic with these
-matrices~\cite{rouet:strumpack}.  Among other things,
-\strumpack{} provides facilities to convert ordinary dense
-matrices into a hierarchical matrix format.  Compression is
-achieved by means of a low rank approximation for sub blocks of
-the matrix.  \strumpack{} provides functions to factor the
-resulting hierarchical matrix into a form suitable for efficient
-solution and thus provides a means to create pre-conditioners for
-dense matrix problems.  All of this functionality is available in
-a distributed memory architecture based on MPI.
+\strumpack{}, for the construction of hierarchically semi-separable
+matrices and for arithmetic with these matrices~\cite{rouet:strumpack}.
+Compression of dense matrices is achieved by means of a low rank
+approximation for sub blocks of the matrix.  \strumpack{} provides
+functions to factor a hierarchical matrix into a form suitable for
+efficient solution and thus provides a means to create pre-conditioners
+for dense matrix problems.  Among other things, \strumpack{} provides
+facilities to convert ordinary dense matrices into a hierarchical matrix
+format.  All of this functionality is available in a distributed memory
+architecture based on MPI.
 
 In this report we replicate a representative subset of the
 computational results presented by Rouet et al.  We focus on
@@ -73,11 +72,11 @@ The following sections provide details on these steps.
 
 \section{Building \strumpack{} on a laptop}
 
-To verify that we could build the package we first get it to run
+To verify that we could build the package, we first get it to run
 on a laptop.  This allows us to iron out any issues ahead of time
 in a controlled environment before attempting to do the same on
 an expensive computer like Edison.  Additionally, this provides
-confidence that \strumpack{} can be used on generic computers and
+confidence that \strumpack{} can be used on generic computers, and
 not just in the specific environment used by Rouet et al.
 
 We obtain the sources from the \strumpack{} distribution website,
@@ -97,14 +96,14 @@ provides concise instructions on how to build \strumpack{}.
 minimal: MPI, BLAS, LAPACK, and ScaLAPACK.\@ For our laptop
 builds We satisfy these requirements as follows:
 \begin{itemize}
-\item For MPI we use mpich version 3.1.4.
-\item For BLAS and LAPACK we use the binary distribution on
+\item For MPI, we use mpich version 3.1.4.
+\item For BLAS and LAPACK, we use the binary distribution on
 the centos 6 linux distribution (rpm packages
 \verb!blas-3.2.1-4.el6.x86_64!,
 \verb!blas-devel-3.2.1-4.el6.x86_64!,
 \verb!lapack-3.2.1-4.el6.x86_64!, and
 \verb!lapack-devel-3.2.1-4.el6.x86_64!).
-\item For ScaLAPACK we use version 2.0.2 from netlib~\cite{netlib}.
+\item For ScaLAPACK, we use version 2.0.2 from netlib~\cite{netlib}.
 \end{itemize}
 All code is compiled with gcc version 4.9.3.
 
@@ -118,14 +117,14 @@ modifications we successfully build the C++, C, and Fortran
 examples.  We don't verify building of the matlab bindings
 because our laptop does not have matlab installed.  We are able
 to execute all example binaries and the output from them looks
-plausible.
+reasonable.
 
 
 \section{Building on Edison}
 
 The majority of the performance results reported
 in~\cite{rouet:strumpack} were obtained on Edison~\cite{Edison} at
-NERSC.\@ To build \strumpack{} on Edison we use the default intel
+NERSC.\@ To build \strumpack{} on Edison, we use the default intel
 programming environment, \verb!PrgEnv-intel/5.2.56!  with version
 15.0.1 20141023 of the intel compilers, and with module
 \verb!cray-mpich/7.3.1! for MPI support.  The template
@@ -145,7 +144,7 @@ problem size to \verb!n=80,000! and change the number of right
 hand sides to \verb!nrhs=1!.  Details of the computation are
 controlled via options of the computational object \verb!sdp! of
 type \verb!StrumpackDensePackage!.  After discussion with Rouet
-et al.\ we configure \verb!sdp! as follows to match the settings
+et al.,\ we configure \verb!sdp! as follows to match the settings
 used in~\cite{rouet:strumpack}:
 \begin{verbatim}
 sdp.use_HSS=true;
@@ -183,12 +182,12 @@ specifies the precision to which the linear system is being
 solved.  Reporting of performance numbers relies on the function
 \verb!sdp.print_statistics()!.
 
-Initially we run the \verb!solve! driver in a mode where the
+Initially, we run the \verb!solve! driver in a mode where the
 precision of the compressed matrix is verified.  The verification
 of the compression is a very memory intensive operation and thus
 requires more compute nodes than were used
 in~\cite{rouet:strumpack}.  After successfully verifying the
-accuracy of the compression we disable the verification feature
+accuracy of the compression, we disable the verification feature
 and reduce the number of nodes to the configuration used
 in~\cite{rouet:strumpack}.  Specifically, we use four compute
 nodes with 16 MPI processes on each of them.
